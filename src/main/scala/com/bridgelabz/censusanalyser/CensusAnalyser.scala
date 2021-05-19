@@ -38,5 +38,6 @@ import java.io.FileReader
           throw new CensusAnalyzerException(Issue.PATH_INCORRECT)
       }
     }
+
   }
 
