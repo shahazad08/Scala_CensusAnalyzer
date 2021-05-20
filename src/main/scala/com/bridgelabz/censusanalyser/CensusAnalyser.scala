@@ -3,6 +3,7 @@ package com.bridgelabz.censusanalyser
 import com.bridgelabz.censusanalyser.CensusAnalyzerException.Issue
 
 import java.io.FileReader
+import scala.io.Source
 
 //class CensusAnalyser {
   //  def add(a:Int,b:Int)={
@@ -10,7 +11,7 @@ import java.io.FileReader
   //    c
   //  }
   class CensusAnalyser {
-    def loadCSVData(filePath: String): Int = {
+    def loadIndiaStateCensusData(filePath: String): Int = {
       try {
         if (!filePath.endsWith(".csv")) {
           throw new CensusAnalyzerException(Issue.INCORRECT_FILE)
@@ -38,6 +39,34 @@ import java.io.FileReader
           throw new CensusAnalyzerException(Issue.PATH_INCORRECT)
       }
     }
+
+  def loadIndiaStateCodeData(filePath: String): Int = {
+    try {
+      if (!filePath.endsWith(".csv")) {
+        throw new CensusAnalyzerException(Issue.INCORRECT_FILE)
+      }
+      val fileReader = Source.fromFile(filePath)
+      var rowCount = 0
+      for (line <- fileReader.getLines()) {
+        val columns = line.split(",").map(_.trim)
+
+        if (columns.length != 4) {
+          throw new CensusAnalyzerException(Issue.INVALID_DELIMITER)
+        }
+        if (rowCount == 0) {
+          if (columns(1) != "State Name" || columns(2) != "TIN" || columns(3) != "StateCode") {
+            throw new CensusAnalyzerException(Issue.INVALID_FIELDS)
+          }
+        }
+        rowCount += 1
+      }
+      rowCount - 1
+    }
+    catch {
+      case _: java.io.FileNotFoundException =>
+        throw new CensusAnalyzerException(Issue.PATH_INCORRECT)
+    }
+  }
 
   }
 
